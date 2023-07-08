@@ -54,10 +54,10 @@ pub fn new(i2c: Twim<TWIM0>) -> Self {
     * so the arcsine calculates the ang
     struct Angle {el 
         */
-pub fn get_current_angle(&self) -> i32{
+pub fn get_current_angle(&self) -> u32{
     let mut acc = self.x_damped / LSM303AGR_SENSITIVITY as f32; 
     acc = limit(acc, 1.0);
-    return arc2degree(acc.asin()) as i32;
+    return arc2degree(acc.asin()) as u32;
 }
         
 pub fn update(&mut self) {
