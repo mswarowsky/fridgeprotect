@@ -17,8 +17,6 @@ use microbit::{
     pac::{twim0::frequency::FREQUENCY_A},
 };
 
-use lsm303agr::Lsm303agr;
-
 pub mod angle;
 use crate::angle::Angle;
 
@@ -33,28 +31,27 @@ fn main() -> ! {
     let board = microbit::Board::take().unwrap();
     
     
-    /* ----------------- Angle --------------- */
-    let i2c = { twim::Twim::new(board.TWIM0, board.i2c_internal.into(), FREQUENCY_A::K100) };
-    let acc_sensor = Lsm303agr::new_with_i2c(i2c);
-    let mut angel : Angle = Angle::new(acc_sensor);
-    /* ----------------- Angle --------------- */
-
+    
     /* ---------------- Display -------------- */
     let mut indicator = Indicator{ 
         display : Display::new(board.display_pins),
         timer : Timer::new(board.TIMER0),
         angle_limit : ANGLE_LIMIT,
     };
-
+    
     /* ---------------- Display -------------- */
-
+    
+    /* ----------------- Angle --------------- */
+    let i2c = { twim::Twim::new(board.TWIM0, board.i2c_internal.into(), FREQUENCY_A::K100) };
+    let mut angle : Angle = Angle::new(i2c);
+    /* ----------------- Angle --------------- */
     rprintln!("Hello, fridge!");
 
     
     
     loop {
-        angel.update();
-        let degrees = angel.get_current_angle();
+        angle.update();
+        let degrees = angle.get_current_angle();
         rprintln!("Current Angle: {}°", degrees);
         indicator.update_display_and_wait(degrees, 500);
 

@@ -2,7 +2,8 @@ use micromath::F32Ext;
 
 use microbit::{
     hal::twim,
-    pac::TWIM0,
+    hal::Twim,
+    pac::TWIM0, 
 };
 
 use lsm303agr::{
@@ -34,7 +35,9 @@ if a > limit {
 }
 
 impl Angle {
-pub fn new(mut acc_sensor : AccSensor) -> Self {
+pub fn new(i2c: Twim<TWIM0>) -> Self {
+    let mut acc_sensor = Lsm303agr::new_with_i2c(i2c);
+ 
     match acc_sensor.accelerometer_id() {
         Ok(0x33u8) => {}
         _ => (),
