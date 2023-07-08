@@ -19,36 +19,19 @@ use microbit::{
 
 use lsm303agr::Lsm303agr;
 
-/* ----------------- Angle --------------- */
 pub mod angle;
 use crate::angle::Angle;
 
-const ANGLE_LIMIT : i32 = 30;
-/* ----------------- Angle --------------- */
+pub mod indication;
+use crate::indication::Indicator;
 
-const DISP_OK : [[u8;5]; 5]= [
-    [0, 0, 0, 1, 0],
-    [0, 0, 1, 0, 1],
-    [0, 1, 1, 0, 0],
-    [0, 1, 0, 0, 0],
-    [1, 0, 0, 0, 0],
-    ];
-    
-    
-const DISP_FAIL : [[u8;5]; 5]= [
-    [1, 0, 0, 0, 1],
-    [0, 1, 0, 1, 0],
-    [0, 0, 1, 0, 0],
-    [0, 1, 0, 1, 0],
-    [1, 0, 0, 0, 1],
-];
+const ANGLE_LIMIT : i32 = 30;
 
 #[entry]
 fn main() -> ! {
     rtt_target::rtt_init_print!();
     let board = microbit::Board::take().unwrap();
-    let mut timer = Timer::new(board.TIMER0);
-
+    
     
     /* ----------------- Angle --------------- */
     let i2c = { twim::Twim::new(board.TWIM0, board.i2c_internal.into(), FREQUENCY_A::K100) };
@@ -57,7 +40,12 @@ fn main() -> ! {
     /* ----------------- Angle --------------- */
 
     /* ---------------- Display -------------- */
-    let mut display = Display::new(board.display_pins);
+    let mut indicator = Indicator{ 
+        display : Display::new(board.display_pins),
+        timer : Timer::new(board.TIMER0),
+        angle_limit : ANGLE_LIMIT,
+    };
+
     /* ---------------- Display -------------- */
 
     rprintln!("Hello, fridge!");
@@ -68,10 +56,7 @@ fn main() -> ! {
         angel.update();
         let degrees = angel.get_current_angle();
         rprintln!("Current Angle: {}°", degrees);
-        if degrees > ANGLE_LIMIT {
-            display.show(&mut timer, DISP_FAIL, 500);    
-        } else {
-            display.show(&mut timer, DISP_OK, 500);
-        }
+        indicator.update_display_and_wait(degrees, 500);
+
     }
 }
