@@ -10,7 +10,7 @@ cortex-m = { version = "0.7", features = ["critical-section-single-core"]}
 cortex-m-rt = "*"
 panic-halt = "0.2.0"
 panic-rtt-target = { version = "*", features = ["cortex-m"]}
-microbit-v2 = "0.10.1"
+microbit-v2 = "0.13.0"
 lsm303agr = "0.2.0"
 rtt-target = "0.4.0"
 micromath = "*"
